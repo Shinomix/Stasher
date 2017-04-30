@@ -1,0 +1,6 @@
+{
+  "BaseURL": "https://slack.com/api",
+
+  "Username": "user_to_send_messages_and_reminders_to", #(ex. @shinomix)
+  "AccessToken": "xoxp-XXXXXXXX-XXXXXXXX-XXXXXXX-XXXXXX" # Team's OAuth Access Token
+}
