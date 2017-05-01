@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -73,8 +72,8 @@ func GetSelfID(config *Config) string {
 
 // LoadConfig fetch data from conf.json and fill pointer of Config object passed in params
 func LoadConfig(conf *Config) bool {
-	file, _ := os.Open("conf.json")
-	decoder := json.NewDecoder(file)
+	file, _ := Asset("conf/conf.json")
+	decoder := json.NewDecoder(strings.NewReader(string(file)))
 	err := decoder.Decode(conf)
 	if err != nil {
 		fmt.Println("[error] Couldn't load conf file: ", err)

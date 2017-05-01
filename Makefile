@@ -1,11 +1,10 @@
 NAME ?= stasher
-PACKAGES = $$(go list ./... | grep -v 'vendor/')
+PACKAGES = $$(go list ./...)
 SHELL := /bin/bash
 
 init:
-	go get -u github.com/kardianos/govendor
 	go get -u github.com/golang/lint/golint
-	govendor sync -v
+	go get -u github.com/jteeuwen/go-bindata/...
 
 fmt:
 	@test -z "$$(gofmt -s -l . | grep -v vendor/)"
@@ -26,6 +25,7 @@ test:
 	@go tool cover -func=.coverage/total.out
 
 build:
+	@go-bindata -o conf-binding.go conf/
 	@go build -o $(NAME)
 
 .PHONY:
