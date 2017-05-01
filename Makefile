@@ -1,5 +1,6 @@
 NAME ?= stasher
 PACKAGES = $$(go list ./...)
+DIR = ~/.stasher
 SHELL := /bin/bash
 
 init:
@@ -25,7 +26,8 @@ test:
 	@go tool cover -func=.coverage/total.out
 
 build:
-	@go-bindata -o conf-binding.go conf/
+	@if [ ! -d $(DIR) ] ; then @mkdir $(DIR) ; fi;
+	@cp ./conf.json $(DIR)
 	@go build -o $(NAME)
 
 .PHONY:

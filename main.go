@@ -11,15 +11,17 @@ import (
 )
 
 type options struct {
-	Message    string
-	Duration   int
-	IsReminder bool
+	Message      string
+	Duration     int
+	IsReminder   bool
+	ConfFilePath string
 }
 
 func registerParams() *options {
 	var message = flag.String("message", "", "Optional message to add to the Slack message")
 	var isReminder = flag.Bool("reminder", false, "Transform simple message to reminder")
 	var duration = flag.Int("duration", 600, "Optional duration for the reminder (in seconds)")
+	var confFilePath = flag.String("conf", os.Getenv("HOME")+"/.stasher", "Folder config file is located in (default to ~/.stasher/)")
 	var showUsage = flag.Bool("help", false, "Display this usage")
 	flag.Parse()
 
@@ -29,9 +31,10 @@ func registerParams() *options {
 	}
 
 	return &options{
-		Message:    *message,
-		Duration:   *duration,
-		IsReminder: *isReminder,
+		Message:      *message,
+		Duration:     *duration,
+		IsReminder:   *isReminder,
+		ConfFilePath: *confFilePath,
 	}
 }
 
@@ -108,7 +111,7 @@ func stashAndNotify(options *options, config *Config) {
 func main() {
 	options := registerParams()
 	config := Config{}
-	if !LoadConfig(&config) {
+	if !LoadConfig(&config, options) {
 		return
 	}
 	stashAndNotify(options, &config)
