@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
+	"strings"
 )
 
 type options struct {
@@ -49,7 +51,7 @@ func simpleMessage(options *options, config *Config, message string) bool {
 		return false
 	}
 
-	fmt.Println("> Message sent with success")
+	fmt.Println("> Message sent with success!")
 	return true
 }
 
@@ -70,16 +72,16 @@ func reminderMessage(options *options, config *Config, message string) bool {
 		return false
 	}
 
-	fmt.Println("> Reminder set with success")
+	fmt.Println("> Reminder set with success!")
 	return true
 }
 
-func sendNotification(options *options, config *Config) {
+func sendNotification(options *options, config *Config, defaultMessage string) {
 	var message string
 	if options.Message != "" {
 		message = options.Message
 	} else {
-		message = "You just stashed some code!"
+		message = defaultMessage
 	}
 
 	if options.IsReminder && options.Duration > 0 {
@@ -89,11 +91,25 @@ func sendNotification(options *options, config *Config) {
 	}
 }
 
+func stashAndNotify(options *options, config *Config) {
+	out, err := exec.Command("git", "stash").Output()
+	if err != nil {
+		panic(err.Error())
+	}
+	outString := fmt.Sprintf("%s", out)
+
+	fmt.Println("> ", outString)
+	if strings.Contains(outString, "No local changes to save") || strings.Contains(outString, "fatal:") {
+		return
+	}
+	sendNotification(options, config, outString)
+}
+
 func main() {
 	options := registerParams()
 	config := Config{}
 	if !LoadConfig(&config) {
 		return
 	}
-	sendNotification(options, &config)
+	stashAndNotify(options, &config)
 }
